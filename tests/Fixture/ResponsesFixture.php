@@ -30,9 +30,9 @@ class ResponsesFixture extends TestFixture
                 'gender' => 'Lorem ipsum dolor sit amet',
                 'location' => 'Lorem ipsum dolor sit amet',
                 'visit_date' => '2025-03-26',
-                'visit_time' => '14:14:43',
+                'visit_time' => '15:49:05',
                 'status' => 1,
-                'created' => '2025-03-26 14:14:43',
+                'created' => '2025-03-26 15:49:05',
             ],
         ];
         parent::init();

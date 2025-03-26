@@ -6,84 +6,110 @@ class NpsController extends AppController
 {
     public function index()
     {
+        // Load the Responses and Branches models
+        $this->loadModel('Responses');
         $this->loadModel('Branches');
-
-        // Fetch all branch names
-        $branches = $this->Branches->find('list', [
-            'keyField' => 'id',
-            'valueField' => 'name'
-        ])->toArray();
-
-        // Pass branches to the view
-        $this->set(compact('branches'));
-            
-        $this->loadModel('Responses');
-
-        // Fetch distinct months from the created column
+    
+        // Fetch branches for the dropdown
+        $branches = $this->Branches->find('list')->toArray();
+    
+        // Fetch unique months from the created date for the dropdown
         $months = $this->Responses->find()
-            ->select(['month' => 'DATE_FORMAT(created, "%M")']) // Get month name
-            ->distinct(['month']) // Ensure unique months
-            ->order(['created' => 'ASC']) // Order by date
+            ->select(['month' => 'MONTH(created)'])
+            ->distinct(['month'])
+            ->order(['month' => 'ASC'])
             ->toArray();
     
-        // Prepare the months array for the dropdown
-        $monthOptions = [];
-        foreach ($months as $month) {
-            $monthOptions[$month->month] = $month->month; // Set the month name as both value and label
-        }
+        // Fetch unique years from the created date for the dropdown
+        $years = $this->Responses->find()
+            ->select(['year' => 'YEAR(created)'])
+            ->distinct(['year'])
+            ->order(['year' => 'ASC'])
+            ->toArray();
     
-        // Pass the months to the view
-        $this->set(compact('monthOptions'));
-
-        $branchTotals = $this->Responses->find()
-        ->select(['branch_id', 'total_responses' => 'COUNT(id)']) // Count total responses per branch
-        ->group('branch_id') // Group by branch_id
-        ->order(['branch_id' => 'ASC']) // Optional: Order by branch ID
-        ->toArray();
-
-    // Prepare the data for the view
-    $branchResponseTotals = [];
-    foreach ($branchTotals as $branchTotal) {
-        $branchResponseTotals[$branchTotal->branch_id] = $branchTotal->total_responses;
-    }
-
-    // Pass the totals to the view
-    $this->set(compact('branchResponseTotals'));
-
-
+        // Initialize totalResponses to null
+        $totalResponses = null;
+    
+        // Check if the form is submitted
         if ($this->request->is('post')) {
-            // Get input data from form
-            $totalResponses = $this->request->getData('total_responses');
-            $csatScore = $this->request->getData('csat_score');
-
-            // Create a new instance of HospitalNPS class and calculate NPS
-            $hospitalNPS = new \App\Utility\HospitalNPS($totalResponses, $csatScore);
-            $result = $hospitalNPS->endorseDecision();
-
-            // Pass the result to the view
-            $this->set('result', $result);
+            $data = $this->request->getData();
+            $selectedBranch = $data['branch'];
+            $selectedMonth = $data['month'];
+            $selectedYear = $data['year'];
+    
+            // Debug: Output the selected values (for debugging purposes)
+            debug($selectedBranch);
+            debug($selectedMonth);
+            debug($selectedYear);
+    
+            // Calculate total responses based on branch, month, and year
+            $totalResponses = $this->Responses->find()
+                ->where([
+                    'branch_id' => $selectedBranch,
+                    'MONTH(created)' => $selectedMonth,
+                    'YEAR(created)' => $selectedYear
+                ])
+                ->count();
+    
+            // Debug: Output totalResponses to check the calculation
+            debug($totalResponses);
         }
+    
+        // Pass data to the view
+        $this->set(compact('branches', 'months', 'years', 'totalResponses'));
     }
-    public function getBranchResponseTotals()
+    public function getBranchMonthYearResponseTotals()
     {
-        // Load the Responses model
+        // Load the Responses and Branches models
         $this->loadModel('Responses');
-
-        // Fetch total responses for each branch (hospital)
-        $branchTotals = $this->Responses->find()
-            ->select(['branch_id', 'total_responses' => 'COUNT(id)']) // Count total responses per branch
-            ->group('branch_id') // Group by branch_id
-            ->order(['branch_id' => 'ASC']) // Optional: Order by branch ID
+        $this->loadModel('Branches');
+    
+        // Fetch branches for the dropdown
+        $branches = $this->Branches->find('list')->toArray();
+    
+        // Fetch unique months from the created date for the dropdown
+        $months = $this->Responses->find()
+            ->select(['month' => 'MONTH(created)'])
+            ->distinct(['month'])
+            ->order(['month' => 'ASC'])
             ->toArray();
-
-        // Prepare the data for the view
-        $branchResponseTotals = [];
-        foreach ($branchTotals as $branchTotal) {
-            $branchResponseTotals[$branchTotal->branch_id] = $branchTotal->total_responses;
+    
+        // Fetch unique years from the created date for the dropdown
+        $years = $this->Responses->find()
+            ->select(['year' => 'YEAR(created)'])
+            ->distinct(['year'])
+            ->order(['year' => 'ASC'])
+            ->toArray();
+    
+        // Initialize totalResponses to null
+        $totalResponses = null;
+    
+        // Check if the form is submitted
+        if ($this->request->is('post')) {
+            $data = $this->request->getData();
+            $selectedBranch = $data['branch'];
+            $selectedMonth = $data['month'];
+            $selectedYear = $data['year'];
+    
+            // Debug: Output the selected values (for debugging purposes)
+            debug($selectedBranch);
+            debug($selectedMonth);
+            debug($selectedYear);
+    
+            // Calculate total responses based on branch, month, and year
+            $totalResponses = $this->Responses->find()
+                ->where([
+                    'branch_id' => $selectedBranch,
+                    'MONTH(created)' => $selectedMonth,
+                    'YEAR(created)' => $selectedYear
+                ])
+                ->count();
+    
+            // Debug: Output totalResponses to check the calculation
+            debug($totalResponses);
         }
-
-        // Pass the totals to the view
-        $this->set(compact('branchResponseTotals'));
+    
+        // Pass data to the view
+        $this->set(compact('branches', 'months', 'years', 'totalResponses'));
     }
-
 }
