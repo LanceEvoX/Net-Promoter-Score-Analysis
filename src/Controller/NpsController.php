@@ -30,31 +30,6 @@ class NpsController extends AppController
         // Initialize totalResponses to null
         $totalResponses = null;
     
-        // Check if the form is submitted
-        if ($this->request->is('post')) {
-            $data = $this->request->getData();
-            $selectedBranch = $data['branch'];
-            $selectedMonth = $data['month'];
-            $selectedYear = $data['year'];
-    
-            // Debug: Output the selected values (for debugging purposes)
-            debug($selectedBranch);
-            debug($selectedMonth);
-            debug($selectedYear);
-    
-            // Calculate total responses based on branch, month, and year
-            $totalResponses = $this->Responses->find()
-                ->where([
-                    'branch_id' => $selectedBranch,
-                    'MONTH(created)' => $selectedMonth,
-                    'YEAR(created)' => $selectedYear
-                ])
-                ->count();
-    
-            // Debug: Output totalResponses to check the calculation
-            debug($totalResponses);
-        }
-    
         // Pass data to the view
         $this->set(compact('branches', 'months', 'years', 'totalResponses'));
     }
@@ -91,11 +66,6 @@ class NpsController extends AppController
             $selectedMonth = $data['month'];
             $selectedYear = $data['year'];
     
-            // Debug: Output the selected values (for debugging purposes)
-            debug($selectedBranch);
-            debug($selectedMonth);
-            debug($selectedYear);
-    
             // Calculate total responses based on branch, month, and year
             $totalResponses = $this->Responses->find()
                 ->where([
@@ -104,12 +74,28 @@ class NpsController extends AppController
                     'YEAR(created)' => $selectedYear
                 ])
                 ->count();
-    
-            // Debug: Output totalResponses to check the calculation
-            debug($totalResponses);
         }
     
         // Pass data to the view
         $this->set(compact('branches', 'months', 'years', 'totalResponses'));
+    }
+
+    public function npscalculate()
+    {
+        $npsResult = null;
+
+        if ($this->request->is('post')) {
+            $totalResponses = $this->request->getData('total_responses');
+            $csatScore = $this->request->getData('csat_score');
+
+            // Instantiate the HospitalNPS utility class
+            $hospitalNps = new HospitalNPS($totalResponses, $csatScore);
+
+            // Get the endorsement decision
+            $npsResult = $hospitalNps->endorseDecision();
+        }
+
+        // Pass the result to the view
+        $this->set(compact('npsResult'));
     }
 }
