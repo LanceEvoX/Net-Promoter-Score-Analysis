@@ -1,6 +1,6 @@
 <?php
 namespace App\Controller;
-use App\Utility\HospitalNPS;
+use Cake\Http\Client;
 
 class NpsController extends AppController
 {
@@ -88,11 +88,31 @@ class NpsController extends AppController
             $totalResponses = $this->request->getData('total_responses');
             $csatScore = $this->request->getData('csat_score');
 
-            // Instantiate the HospitalNPS utility class
-            $hospitalNps = new HospitalNPS($totalResponses, $csatScore);
+            // Create HTTP Client to make the request to FastAPI
+            $http = new Client();
 
-            // Get the endorsement decision
-            $npsResult = $hospitalNps->endorseDecision();
+            // Define FastAPI URL (assuming it's running on localhost:8000)
+            $url = 'http://localhost:8000/predict-nps';
+
+            // Prepare data for FastAPI
+            $data = [
+                'total_responses' => $totalResponses,
+                'csat_score' => $csatScore
+            ];
+
+            // Send POST request to FastAPI
+            $response = $http->post($url, json_encode($data), [
+                'headers' => ['Content-Type' => 'application/json']
+            ]);
+
+            // Check if the request was successful
+            if ($response->isOk()) {
+                // Get the result from FastAPI response
+                $npsResult = $response->getJson()['nps_result'];
+            } else {
+                // Handle error if FastAPI is down or returns an error
+                $npsResult = "Error connection";
+            }
         }
 
         // Pass the result to the view

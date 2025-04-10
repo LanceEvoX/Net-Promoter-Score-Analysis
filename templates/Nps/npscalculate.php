@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Net Promoter Score Calculation</title>
+    <title>Net Promoter Score Analyzation</title>
     <!-- Add Bootstrap CDN for easier styling -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -33,7 +33,7 @@
 
 <div class="container mt-5">
     <div class="card shadow-lg p-5">
-        <h2 class="text-center mb-4">Net Promoter Score Calculator</h2>
+        <h2 class="text-center mb-4">Net Promoter Score Analyzation</h2>
 
         <?= $this->Form->create(null, ['url' => ['action' => 'npscalculate'], 'class' => 'form']) ?>
         
@@ -60,14 +60,14 @@
         </fieldset>
 
         <div class="text-center">
-            <?= $this->Form->button('Calculate NPS', ['class' => 'btn btn-primary']) ?>
+            <?= $this->Form->button('Analyze NPS', ['class' => 'btn btn-primary']) ?>
         </div>
 
         <?= $this->Form->end() ?>
 
-        <!-- Display the result if it's set -->
+        <!-- Display result -->
         <?php if (isset($npsResult)): ?>
-            <h3 class="text-center result mt-5">Result: <?= h($npsResult) ?></h3>
+        <h3 class="text-center result mt-5">Result: <?= h($npsResult) ?></h3>
         <?php endif; ?>
     </div>
 </div>

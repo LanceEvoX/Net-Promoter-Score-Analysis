@@ -39,7 +39,7 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
             <a href="<?= $this->Url->build('/nps') ?>"><span>Cake</span>PHP</a>
         </div>
         <div class="top-nav-links">
-            <a href="http://localhost:8765/nps/npscalculate">NPS Calculator</a>
+            <a href="http://localhost:8765/nps/npscalculate">NPS Analyzation</a>
             <a href="http://localhost:8765/nps/getBranchMonthYearResponseTotals">Total Response Counter</a>
         </div>
     </nav>
