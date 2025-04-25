@@ -38,26 +38,25 @@
         <?= $this->Form->create(null, ['url' => ['action' => 'npscalculate'], 'class' => 'form']) ?>
         
         <fieldset>
-            <legend class="text-center mb-4">Enter Responses and CSAT Score</legend>
-            
-            <div class="mb-4">
-                <?= $this->Form->control('total_responses', [
-                    'label' => 'Total Responses', 
-                    'type' => 'number', 
-                    'class' => 'form-control', 
-                    'required' => true
-                ]) ?>
-            </div>
-            
-            <div class="mb-4">
-                <?= $this->Form->control('csat_score', [
-                    'label' => 'CSAT Score (0-100)', 
-                    'type' => 'number', 
-                    'class' => 'form-control', 
-                    'required' => true
-                ]) ?>
-            </div>
+        <legend class="text-center mb-4">Sentiment Counts from Database</legend>
+
+        <div class="mb-4">
+            <label>Positive Responses</label>
+            <input type="number" class="form-control" value="<?= h($positiveCount) ?>" readonly>
+        </div>
+
+        <div class="mb-4">
+            <label>Neutral Responses</label>
+            <input type="number" class="form-control" value="<?= h($neutralCount) ?>" readonly>
+        </div>
+
+        <div class="mb-4">
+            <label>Negative Responses</label>
+            <input type="number" class="form-control" value="<?= h($negativeCount) ?>" readonly>
+        </div>
         </fieldset>
+
+
 
         <div class="text-center">
             <?= $this->Form->button('Analyze NPS', ['class' => 'btn btn-primary']) ?>

@@ -5,31 +5,50 @@ import numpy as np
 
 app = FastAPI()
 
+# Sample data for training Logistic Regression (positive, neutral, negative counts)
+# Higher positive counts increase chance of being endorsed
 
-# Sample data for training Logistic Regression (Responses, CSAT Score, and whether it is Endorsed or Not)
-# This data needs to reflect past training on responses and whether they were endorsed or not.
-# 1: Endorsed, 0: Not Endorsed
-responses = np.array([[100, 85], [200, 90], [150, 60], [300, 70], [250, 95], [50, 95], [50, 65]])  # Total Responses, CSAT Score
-endorsed = np.array([1, 1, 0, 0, 1, 1, 0])  # 1 for Endorsed, 0 for Not Endorsed
+sentiments = np.array([
+    [80, 10, 10],  # positive
+    [60, 20, 20],  # positive
+    [30, 40, 30],  # neutral
+    [20, 10, 70],  # negative
+    [5, 10, 30],   # negative
+    [90, 5, 5],    # positive
+    [1, 1, 10],    # negative
+    [10, 10, 15],  # negative
+    [1, 10, 1],    # neutral
+    [10, 1, 1],    # positive
+    
+    [70, 20, 10],  # positive
+    [50, 30, 20],  # positive
+    [25, 40, 35],  # neutral
+    [15, 25, 60],  # negative
+    [5, 5, 85],    # negative
+    [85, 10, 5],   # positive
+    [10, 5, 70],   # negative
+    [8, 12, 25],   # negative
+    [20, 30, 30],  # neutral
+    [95, 2, 3],    # positive
+])
+
+endorsed = np.array([
+    1, 1, 0, 0, 0, 1, 0, 0, 0, 1,
+    1, 1, 0, 0, 0, 1, 0, 0, 0, 1
+])
+
 
 # Train Logistic Regression Model
-model = LogisticRegression()
-model.fit(responses, endorsed)
+log_reg_model = LogisticRegression()
+log_reg_model.fit(sentiments, endorsed)
 
-class NPSRequest(BaseModel):
-    total_responses: int
-    csat_score: int
+class SentimentRequest(BaseModel):
+    positive: int
+    neutral: int
+    negative: int
 
 @app.post("/predict-nps")
-def predict_nps(request: NPSRequest):
-    # Prepare input data for prediction
-    response_data = np.array([[request.total_responses, request.csat_score]])
-
-    # Predict endorsement (1: Endorsed, 0: Not Endorsed)
-    prediction = model.predict(response_data)
-
-    # Based on the prediction, return whether it is endorsed or not
-    if prediction[0] == 1:
-        return {"nps_result": "Endorsed"}
-    else:
-        return {"nps_result": "Not Endorsed"}
+def predict_nps(request: SentimentRequest):
+    data = np.array([[request.positive, request.neutral, request.negative]])
+    prediction = log_reg_model.predict(data)
+    return {"nps_result": "Endorsed" if prediction[0] == 1 else "Not Endorsed"}

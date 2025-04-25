@@ -82,40 +82,36 @@ class NpsController extends AppController
 
     public function npscalculate()
     {
+        $this->loadModel('Sentiments');
         $npsResult = null;
+    
+        // Count each sentiment
+        $positiveCount = $this->Sentiments->find()->where(['sentiment' => 'Positive'])->count();
+        $neutralCount = $this->Sentiments->find()->where(['sentiment' => 'Neutral'])->count();
+        $negativeCount = $this->Sentiments->find()->where(['sentiment' => 'Negative'])->count();
 
+    
         if ($this->request->is('post')) {
-            $totalResponses = $this->request->getData('total_responses');
-            $csatScore = $this->request->getData('csat_score');
-
-            // Create HTTP Client to make the request to FastAPI
-            $http = new Client();
-
-            // Define FastAPI URL (assuming it's running on localhost:8000)
-            $url = 'http://localhost:8000/predict-nps';
-
-            // Prepare data for FastAPI
             $data = [
-                'total_responses' => $totalResponses,
-                'csat_score' => $csatScore
+                'positive' => $positiveCount,
+                'neutral' => $neutralCount,
+                'negative' => $negativeCount
             ];
-
-            // Send POST request to FastAPI
+    
+            $http = new Client();
+            $url = 'http://localhost:8000/predict-nps';
+    
             $response = $http->post($url, json_encode($data), [
                 'headers' => ['Content-Type' => 'application/json']
             ]);
-
-            // Check if the request was successful
+    
             if ($response->isOk()) {
-                // Get the result from FastAPI response
                 $npsResult = $response->getJson()['nps_result'];
             } else {
-                // Handle error if FastAPI is down or returns an error
                 $npsResult = "Error connection";
             }
         }
-
-        // Pass the result to the view
-        $this->set(compact('npsResult'));
-    }
+    
+        $this->set(compact('npsResult', 'positiveCount', 'neutralCount', 'negativeCount'));
+    }     
 }
