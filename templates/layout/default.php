@@ -14,7 +14,7 @@
  * @var \App\View\AppView $this
  */
 
-$cakeDescription = 'CakePHP: the rapid development php framework';
+$cakeDescription = 'Sample';
 ?>
 <!DOCTYPE html>
 <html>
@@ -37,10 +37,6 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
     <nav class="top-nav">
         <div class="top-nav-title">
             <a href="<?= $this->Url->build('/nps') ?>"><span>Cake</span>PHP</a>
-        </div>
-        <div class="top-nav-links">
-            <a href="http://localhost:8765/nps/npscalculate">NPS Analyzation</a>
-            <a href="http://localhost:8765/nps/getBranchMonthYearResponseTotals">Total Response Counter</a>
         </div>
     </nav>
     <main class="main">

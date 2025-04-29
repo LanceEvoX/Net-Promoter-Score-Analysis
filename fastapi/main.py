@@ -1,40 +1,45 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sklearn.linear_model import LogisticRegression
 import numpy as np
 
 app = FastAPI()
 
-# Sample data for training Logistic Regression (positive, neutral, negative counts)
-# Higher positive counts increase chance of being endorsed
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust this to restrict the origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
+
 
 sentiments = np.array([
-    [80, 10, 10],  # positive
-    [60, 20, 20],  # positive
-    [30, 40, 30],  # neutral
-    [20, 10, 70],  # negative
-    [5, 10, 30],   # negative
-    [90, 5, 5],    # positive
-    [1, 1, 10],    # negative
-    [10, 10, 15],  # negative
-    [1, 10, 1],    # neutral
-    [10, 1, 1],    # positive
-    
-    [70, 20, 10],  # positive
-    [50, 30, 20],  # positive
-    [25, 40, 35],  # neutral
-    [15, 25, 60],  # negative
-    [5, 5, 85],    # negative
-    [85, 10, 5],   # positive
-    [10, 5, 70],   # negative
-    [8, 12, 25],   # negative
-    [20, 30, 30],  # neutral
-    [95, 2, 3],    # positive
+    # 0–100 range
+    [80, 10, 10], [60, 20, 20], [30, 40, 30], [20, 10, 70], [5, 10, 30],
+    [90, 5, 5], [10, 10, 80], [20, 10, 15], [5, 45, 35], [20, 5, 5],
+
+    # 0–1000 range
+    [800, 100, 100], [600, 200, 200], [300, 400, 300], [200, 100, 700],
+    [50, 100, 300], [900, 50, 50], [10, 10, 100], [100, 100, 150],
+    [10, 100, 10], [100, 10, 10],
+
+    # 0–100 range
+    [85, 10, 5], [75, 15, 10], [35, 30, 20], [25, 30, 45], [10, 20, 70],
+    [5, 5, 90], [80, 60, 20], [60, 40, 10], [15, 20, 65], [20, 40, 40],
+
+    # 0–1000 range
+    [850, 100, 50], [750, 150, 100], [350, 300, 200], [250, 300, 450],
+    [100, 200, 700], [50, 50, 900], [850, 650, 250], [650, 250, 150],
+    [150, 250, 600], [300, 500, 200],
 ])
 
 endorsed = np.array([
     1, 1, 0, 0, 0, 1, 0, 0, 0, 1,
-    1, 1, 0, 0, 0, 1, 0, 0, 0, 1
+    1, 1, 0, 0, 0, 1, 0, 0, 0, 1,
+    1, 1, 0, 0, 0, 0, 1, 1, 0, 0,
+    1, 1, 0, 0, 0, 0, 1, 1, 0, 0
 ])
 
 
